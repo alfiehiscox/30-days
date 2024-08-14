@@ -43,8 +43,8 @@ fn createNewSave() !void {
 }
 
 // Gets the current target time from disk.
-// If it cannot find a current timer, a new one of 30days is created.
-// If the current time has expired, a new one of 30days is created.
+// If it cannot find a current timer, a new one of 30 days is created.
+// If the current time has expired, a new one of 30 days is created.
 fn getTargetTime() !u64 {
     const cwd: fs.Dir = fs.cwd();
 
@@ -63,7 +63,13 @@ fn getTargetTime() !u64 {
     var buf: [20]u8 = undefined;
     const amount = try target.readAll(&buf);
 
-    const timestamp = try std.fmt.parseInt(u64, buf[0..amount], 10);
+    var timestamp = try std.fmt.parseInt(u64, buf[0..amount], 10);
+
+    if (std.time.timestamp() > timestamp) {
+        std.debug.print("Your timer has expired. Creating a new one.\n\n", .{});
+        try cwd.deleteFile(SAVE_FILE);
+        timestamp = try getTargetTime();
+    }
 
     return timestamp;
 }
