@@ -115,7 +115,7 @@ fn centerText(text: []const u8, buff: []u8) !usize {
 fn print(time_remaining: []u8, quote: []const u8) !void {
     const stdout = std.io.getStdOut();
     const writer = stdout.writer();
-    try writer.print("=" ** COLS ++ "\n", .{});
+    try writer.print("=" ** COLS ++ "\n\n", .{});
 
     var buf: [COLS]u8 = undefined;
     var amount = try centerText(time_remaining, &buf);
@@ -131,10 +131,10 @@ fn print(time_remaining: []u8, quote: []const u8) !void {
         const first_amount = try centerText(first, &buf);
         try writer.print("{s}\n", .{buf[0..first_amount]});
         const second_amount = try centerText(second, &buf);
-        try writer.print("{s}\n", .{buf[0..second_amount]});
+        try writer.print("{s}\n\n", .{buf[0..second_amount]});
     } else {
         amount = try centerText(quote, &buf);
-        try writer.print("{s}\n", .{buf[0..amount]});
+        try writer.print("{s}\n\n", .{buf[0..amount]});
     }
 
     try writer.print("=" ** COLS ++ "\n", .{});
