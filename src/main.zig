@@ -5,6 +5,7 @@ const DAY_SECONDS = 86400;
 const HOUR_SECONDS = 3600;
 const MINUTE_SECONDS = 60;
 const SAVE_FILE = ".30-days";
+const COLS = 100;
 
 // Writes seconds into buf in the format:
 //   00 Days, 00 Hrs, 00 Mins, 00 Secs
@@ -74,16 +75,40 @@ fn getTargetTime() !u64 {
     return timestamp;
 }
 
+fn centerText(text: []const u8, buff: []u8) !usize {
+    if (text.len > COLS) return error.Error;
+    const padding_amt = COLS - text.len;
+    const left_pad_amt = padding_amt / 2;
+    const right_pad_amt = padding_amt - left_pad_amt;
+
+    var padding_buf: [64]u8 = undefined; // assume 64 elems is enough
+    @memset(&padding_buf, ' ');
+    const padding_left = padding_buf[0..left_pad_amt];
+    const padding_right = padding_buf[0..right_pad_amt];
+
+    const act = try std.fmt.bufPrint(buff, "{s}{s}{s}", .{ padding_left, text, padding_right });
+    return act.len;
+}
+
+fn print(time_remaining: []u8) !void {
+    const writer = std.io.getStdOut().writer();
+    try writer.print("=" ** COLS ++ "\n", .{});
+    var buf: [COLS]u8 = undefined;
+    const amount = try centerText(time_remaining, &buf);
+    try writer.print("{s}\n", .{buf[0..amount]});
+    try writer.print("=" ** COLS ++ "\n", .{});
+}
+
 pub fn main() !void {
     const target_time: u64 = try getTargetTime();
 
     while (true) : (std.time.sleep(1e+9)) {
         const current_time: u64 = @intCast(std.time.timestamp());
         const delta = target_time - current_time;
-        var buf: [64]u8 = undefined;
+        var buf: [33]u8 = undefined;
         const amount = try fmtSeconds(delta, &buf);
         const formatted = buf[0..amount];
-        std.debug.print("{s}\n", .{formatted});
+        try print(formatted);
         if (delta <= 0) break;
     }
 }
