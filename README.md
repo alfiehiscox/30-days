@@ -12,13 +12,10 @@ Something like this, it should be redrawn every second.
 
 ===========================================================================
 
-                                 Day 5
-
                         25 days, 5 Hs, 3ms, 20s
                                Remaining
 
-                    "Through discipline comes freedom"
-                                Aristole
+              "Through discipline comes freedom" ~Aristole
     
     [X][X][X][X][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
                           [ ][ ][ ][ ][ ][ ][ ][ ]

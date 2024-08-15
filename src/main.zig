@@ -5,7 +5,9 @@ const DAY_SECONDS = 86400;
 const HOUR_SECONDS = 3600;
 const MINUTE_SECONDS = 60;
 const SAVE_FILE = ".30-days";
-const COLS = 100;
+const quoteFile = @embedFile("quotes.txt");
+const COLS = 70;
+const NUM_QUOTES = 99;
 
 // Writes seconds into buf in the format:
 //   00 Days, 00 Hrs, 00 Mins, 00 Secs
@@ -75,8 +77,28 @@ fn getTargetTime() !u64 {
     return timestamp;
 }
 
+fn getNextQuote(delta: u64) ![]const u8 {
+    var splits = std.mem.splitSequence(u8, quoteFile, "\n");
+    const day = @divFloor(delta, DAY_SECONDS) % 30;
+
+    var line_number: u8 = 0;
+    while (splits.next()) |line| {
+        defer line_number += 1;
+        if (line_number == day) return line;
+    }
+
+    unreachable;
+}
+
+fn clearScreen() !void {
+    const writer = std.io.getStdOut().writer();
+    try writer.print("\x1b[2J", .{}); // clears screen
+    try writer.print("\x1b[H", .{}); // cursor to top left
+}
+
 fn centerText(text: []const u8, buff: []u8) !usize {
     if (text.len > COLS) return error.Error;
+
     const padding_amt = COLS - text.len;
     const left_pad_amt = padding_amt / 2;
     const right_pad_amt = padding_amt - left_pad_amt;
@@ -90,12 +112,31 @@ fn centerText(text: []const u8, buff: []u8) !usize {
     return act.len;
 }
 
-fn print(time_remaining: []u8) !void {
-    const writer = std.io.getStdOut().writer();
+fn print(time_remaining: []u8, quote: []const u8) !void {
+    const stdout = std.io.getStdOut();
+    const writer = stdout.writer();
     try writer.print("=" ** COLS ++ "\n", .{});
+
     var buf: [COLS]u8 = undefined;
-    const amount = try centerText(time_remaining, &buf);
+    var amount = try centerText(time_remaining, &buf);
     try writer.print("{s}\n", .{buf[0..amount]});
+
+    try writer.print("\n", .{});
+
+    buf = undefined;
+    if (quote.len > COLS) {
+        const half = @divFloor(quote.len, 2);
+        const first = quote[0..half];
+        const second = quote[half..];
+        const first_amount = try centerText(first, &buf);
+        try writer.print("{s}\n", .{buf[0..first_amount]});
+        const second_amount = try centerText(second, &buf);
+        try writer.print("{s}\n", .{buf[0..second_amount]});
+    } else {
+        amount = try centerText(quote, &buf);
+        try writer.print("{s}\n", .{buf[0..amount]});
+    }
+
     try writer.print("=" ** COLS ++ "\n", .{});
 }
 
@@ -103,12 +144,20 @@ pub fn main() !void {
     const target_time: u64 = try getTargetTime();
 
     while (true) : (std.time.sleep(1e+9)) {
+        // Time Logic
         const current_time: u64 = @intCast(std.time.timestamp());
         const delta = target_time - current_time;
         var buf: [33]u8 = undefined;
         const amount = try fmtSeconds(delta, &buf);
         const formatted = buf[0..amount];
-        try print(formatted);
+
+        // Quote Logic
+        const quote = try getNextQuote(delta);
+
+        // Render
+        try clearScreen();
+        try print(formatted, quote);
+
         if (delta <= 0) break;
     }
 }
