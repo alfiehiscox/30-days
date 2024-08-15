@@ -27,7 +27,7 @@ was a fun challenge, but mostly due to **no** knowledge of allocation in zig.
 
 On that note, [this blog post](https://blog.orhun.dev/zig-bits-01/) was really helpful. 
 
-I credit this program for really hammering into me what slices under the hood, 
+I credit this program for really hammering into me what slices are under the hood, 
 and the experience of passing buffers around to functions. I'm not sure if it's 
 idiomatic, but had a cool time. 
 
