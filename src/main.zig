@@ -69,7 +69,6 @@ fn getTargetTime() !u64 {
     var timestamp = try std.fmt.parseInt(u64, buf[0..amount], 10);
 
     if (std.time.timestamp() > timestamp) {
-        std.debug.print("Your timer has expired. Creating a new one.\n\n", .{});
         try cwd.deleteFile(SAVE_FILE);
         timestamp = try getTargetTime();
     }
@@ -79,7 +78,10 @@ fn getTargetTime() !u64 {
 
 fn getNextQuote(delta: u64) ![]const u8 {
     var splits = std.mem.splitSequence(u8, quoteFile, "\n");
-    const day = @divFloor(delta, DAY_SECONDS) % 30;
+
+    // The -1 here means a new quote is given at the
+    // strike of the hour.
+    const day = @divFloor(delta - 1, DAY_SECONDS) % 30;
 
     var line_number: u8 = 0;
     while (splits.next()) |line| {
