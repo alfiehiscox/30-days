@@ -6,7 +6,7 @@ const HOUR_SECONDS = 3600;
 const MINUTE_SECONDS = 60;
 const SAVE_FILE = ".30-days";
 const quoteFile = @embedFile("quotes.txt");
-const COLS = 70;
+const COLS = 80;
 const NUM_QUOTES = 99;
 
 // Writes seconds into buf in the format:
