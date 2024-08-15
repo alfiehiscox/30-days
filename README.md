@@ -9,6 +9,7 @@ This test is a simple ascii 30 day countdown, that will:
 
 Something like this, it should be redrawn every second.
 
+```
 ===========================================================================
 
                         25 days, 5 Hs, 3ms, 20s
@@ -16,6 +17,7 @@ Something like this, it should be redrawn every second.
               "Through discipline comes freedom" ~Aristole
 
 ===========================================================================
+```
 
 ## Retrospective
 
